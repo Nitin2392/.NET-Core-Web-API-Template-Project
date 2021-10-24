@@ -54,11 +54,17 @@ namespace BoilerPlate.Services
             }
         }
 
-        public async Task<List<User>> GetUserById(int id)
+        public async Task<User> GetUserById(int id)
         {
             try
             {
-                var userList = new List<User>();
+                var cachedUser = CacheHelper.GetValue(id.ToString());
+                if (cachedUser != null)
+                {
+                    return (User) cachedUser;
+                }
+
+                var userList = new User();
                 var dataAccess = new BaseDataAccess(_appSettings);
 
                 var paramDict = new Dictionary<string, object>
@@ -76,10 +82,8 @@ namespace BoilerPlate.Services
                         Id = row["Id"].ToString(),
                         Gender = row["Gender"].ToString(),
                     };
-
-                    userList.Add(user);
                 }
-
+                
                 return userList;
             }
             catch (Exception e)
@@ -104,14 +108,72 @@ namespace BoilerPlate.Services
                     {"@gender", user.Gender},
                 };
 
-                var userID = dataAccess.ExecuteDataSet("sp_CreateNewUser", dataAccess.GenerateParameters(paramDict));
+                var dataSet = dataAccess.ExecuteDataSet("sp_CreateNewUser", dataAccess.GenerateParameters(paramDict));
+                var userID = dataSet.Tables[0].Rows[0]["UserId"].ToString();
 
-                return Convert.ToInt32(userID.Tables[0].Rows[0]["UserId"].ToString());
+                CacheHelper.OverWrite(userID, user);
+
+                return Convert.ToInt32(userID);
             }
             catch (Exception e)
             {
                 _logger.LogError("Something went wrong in CreateNewUser", e);
                 return -1;
+            }
+        }
+
+        public async Task<int> UpdateUser(User user, int userID)
+        {
+            try
+            {
+                var dataAccess = new BaseDataAccess(_appSettings);
+
+                var paramDict = new Dictionary<string, object>
+                {
+                    {"@FName", user.FirstName},
+                    {"@LName", user.LastName},
+                    {"@UserName", user.UserName},
+                    {"@pass", user.Password},
+                    {"@gender", user.Gender},
+                    {"@UserId", userID }
+                };
+
+                var dataSet = dataAccess.ExecuteDataSet("sp_UpdateUser", dataAccess.GenerateParameters(paramDict));
+                var id = dataSet.Tables[0].Rows[0]["UserId"].ToString();
+
+                CacheHelper.OverWrite(id, user);
+
+                return Convert.ToInt32(userID);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Something went wrong in CreateNewUser", e);
+                return -1;
+            }
+        }
+
+        public async Task<bool> DeleteUser(int userID)
+        {
+            try
+            {
+                var dataAccess = new BaseDataAccess(_appSettings);
+
+                var paramDict = new Dictionary<string, object>
+                {
+                    {"@UserId", userID }
+                };
+
+                var dataSet = dataAccess.ExecuteDataSet("sp_DeleteUser", dataAccess.GenerateParameters(paramDict));
+                var response = dataSet.Tables[0].Rows[0]["Response"].ToString();
+
+                CacheHelper.Delete(userID.ToString());
+
+                return response.ToLower() == "success";
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Something went wrong in CreateNewUser", e);
+                return false;
             }
         }
     }

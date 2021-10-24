@@ -9,8 +9,12 @@ namespace BoilerPlate.Interfaces
     public interface IUserService
     {
         Task<List<User>> GetAllUsers();
-        Task<List<User>> GetUserById(int id);
+        Task<User> GetUserById(int id);
 
         Task<int> CreateNewUser(User user);
+
+        Task<int> UpdateUser(User user, int userId);
+
+        Task<bool> DeleteUser(int userId);
     }
 }

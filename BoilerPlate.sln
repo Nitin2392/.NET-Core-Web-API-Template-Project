@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoilerPlate", "BoilerPlate.csproj", "{6A9D9571-D110-410A-945F-27BEFEDE5A94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlateTest", "..\BoilerPlateTest\BoilerPlateTest.csproj", "{13F21AE0-85E2-4FDA-916F-2325249583F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6A9D9571-D110-410A-945F-27BEFEDE5A94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A9D9571-D110-410A-945F-27BEFEDE5A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A9D9571-D110-410A-945F-27BEFEDE5A94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13F21AE0-85E2-4FDA-916F-2325249583F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13F21AE0-85E2-4FDA-916F-2325249583F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13F21AE0-85E2-4FDA-916F-2325249583F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13F21AE0-85E2-4FDA-916F-2325249583F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

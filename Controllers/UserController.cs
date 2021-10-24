@@ -84,6 +84,14 @@ namespace BoilerPlate.Controllers
         [HttpPost("CreateNewUser")]
         public async Task<IActionResult> CreateNewUser([FromBody] User user)
         {
+            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            {
+                return new UnauthorizedObjectResult(new
+                {
+                    Error = "Request Not Authenticated" //Anonymous Types
+                });
+            }
+
             if (!user.ValidateNewUser().ValidationResult)
             {
                 return new BadRequestObjectResult(new
@@ -98,17 +106,85 @@ namespace BoilerPlate.Controllers
             {
                 return new BadRequestResult();
             }
-            else
+
+            return new OkObjectResult(new
             {
-                return new OkObjectResult(new
-                {
-                    UserId = userId.ToString()
-                });
-            }
+                UserId = userId.ToString()
+            });
         }
 
-        //Sample PUT request
+        //Sample PUT request 
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] User user)
+        {
+            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            {
+                return new UnauthorizedObjectResult(new
+                {
+                    Error = "Request Not Authenticated" //Anonymous Types
+                });
+            }
+
+            if (user.Id == null)
+            {
+                return new BadRequestObjectResult(new
+                {
+                    Error = "Id has to be present"
+                });
+            }
+
+            if (!user.ValidateNewUser().ValidationResult)
+            {
+                return new BadRequestObjectResult(new
+                {
+                    Error = user.ValidateNewUser().Reason
+                });
+            }
+
+            var userId = await _userService.UpdateUser(user, Convert.ToInt32(user.Id));
+
+            if (userId == -1)
+            {
+                return new BadRequestResult();
+            }
+
+            return new OkObjectResult(new
+            {
+                UserId = userId.ToString()
+            });
+        }
 
         //Sample Delete request
+        [HttpDelete("DeleteUser")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            {
+                return new UnauthorizedObjectResult(new
+                {
+                    Error = "Request Not Authenticated" //Anonymous Types
+                });
+            }
+
+            if (id == null)
+            {
+                return new BadRequestObjectResult(new
+                {
+                    Error = "Id has to be present"
+                });
+            }
+
+            var response = await _userService.DeleteUser(Convert.ToInt32(id));
+
+            if (!response)
+            {
+                return new BadRequestResult();
+            }
+
+            return new OkObjectResult(new
+            {
+                Response = true
+            });
+        }
     }
 }
