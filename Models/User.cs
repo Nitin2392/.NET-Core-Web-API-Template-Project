@@ -7,7 +7,7 @@
         public string LastName { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
-        public char Gender { get; set; }
+        public string Gender { get; set; }
     }
 
     public enum Gender

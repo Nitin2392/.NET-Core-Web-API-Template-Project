@@ -10,5 +10,7 @@ namespace BoilerPlate.Interfaces
     {
         Task<List<User>> GetAllUsers();
         Task<List<User>> GetUserById(int id);
+
+        Task<int> CreateNewUser(User user);
     }
 }

@@ -74,7 +74,7 @@ namespace BoilerPlate.Services
                         FirstName = row["FirstName"].ToString(),
                         LastName = row["LastName"].ToString(),
                         Id = row["Id"].ToString(),
-                        Gender = Convert.ToChar(row["Gender"]),
+                        Gender = row["Gender"].ToString(),
                     };
 
                     userList.Add(user);
@@ -84,8 +84,34 @@ namespace BoilerPlate.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Something went wrong in GetAllUsers - ", e);
+                _logger.LogError("Something went wrong in GetUserById - ", e);
                 return null;
+            }
+        }
+
+        public async Task<int> CreateNewUser(User user)
+        {
+            try
+            {
+                var dataAccess = new BaseDataAccess(_appSettings);
+
+                var paramDict = new Dictionary<string, object>
+                {
+                    {"@FName", user.FirstName},
+                    {"@LName", user.LastName},
+                    {"@UserName", user.UserName},
+                    {"@pass", user.Password},
+                    {"@gender", user.Gender},
+                };
+
+                var userID = dataAccess.ExecuteDataSet("sp_CreateNewUser", dataAccess.GenerateParameters(paramDict));
+
+                return Convert.ToInt32(userID.Tables[0].Rows[0]["UserId"].ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Something went wrong in CreateNewUser", e);
+                return -1;
             }
         }
     }

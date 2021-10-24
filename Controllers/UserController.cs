@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using BoilerPlate.Interfaces;
@@ -8,6 +9,7 @@ using BoilerPlate.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static BoilerPlate.Configuration.ModelValidation;
 
 namespace BoilerPlate.Controllers
 { 
@@ -33,7 +35,7 @@ namespace BoilerPlate.Controllers
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
-            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            if (!Request.Headers.ContainsKey("Authorization") || !_helperService.ValidateHeader(Request.Headers["Authorization"]))
             {
                 return new UnauthorizedObjectResult(new 
                 {
@@ -79,6 +81,31 @@ namespace BoilerPlate.Controllers
         }
 
         //Sample POST request 
+        [HttpPost("CreateNewUser")]
+        public async Task<IActionResult> CreateNewUser([FromBody] User user)
+        {
+            if (!user.ValidateNewUser().ValidationResult)
+            {
+                return new BadRequestObjectResult(new
+                {
+                    Error = user.ValidateNewUser().Reason
+                });
+            }
+
+            var userId = await _userService.CreateNewUser(user);
+
+            if (userId == -1)
+            {
+                return new BadRequestResult();
+            }
+            else
+            {
+                return new OkObjectResult(new
+                {
+                    UserId = userId.ToString()
+                });
+            }
+        }
 
         //Sample PUT request
 
