@@ -9,3 +9,4 @@ This is a boiler plate scaffolding for setting up a Web API project in .NET Core
 * Helper Classes
 * In-Memory Cache
 * SQL Cheat Sheet for DB Queries
+* Has Swagger implemented
