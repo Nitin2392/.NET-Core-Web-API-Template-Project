@@ -55,9 +55,9 @@ namespace BoilerPlate.Controllers
 
         //Sample GET request based on ID
         [HttpGet("GetUserById/{id}")]
-        public async Task<IActionResult> GetAllUsers(int? id)
+        public async Task<IActionResult> GetUserById(int? id)
         {
-            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            if (!Request.Headers.ContainsKey("Authorization") || !_helperService.ValidateHeader(Request.Headers["Authorization"]))
             {
                 return new UnauthorizedObjectResult(new
                 {
@@ -84,7 +84,7 @@ namespace BoilerPlate.Controllers
         [HttpPost("CreateNewUser")]
         public async Task<IActionResult> CreateNewUser([FromBody] User user)
         {
-            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            if (!Request.Headers.ContainsKey("Authorization") || !_helperService.ValidateHeader(Request.Headers["Authorization"]))
             {
                 return new UnauthorizedObjectResult(new
                 {
@@ -117,7 +117,7 @@ namespace BoilerPlate.Controllers
         [HttpPut("UpdateUser")]
         public async Task<IActionResult> UpdateUser([FromBody] User user)
         {
-            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            if (!Request.Headers.ContainsKey("Authorization") || !_helperService.ValidateHeader(Request.Headers["Authorization"]))
             {
                 return new UnauthorizedObjectResult(new
                 {
@@ -155,10 +155,10 @@ namespace BoilerPlate.Controllers
         }
 
         //Sample Delete request
-        [HttpDelete("DeleteUser")]
-        public async Task<IActionResult> DeleteUser(string id)
+        [HttpDelete("DeleteUser/{id}")]
+        public async Task<IActionResult> DeleteUser(int? id)
         {
-            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            if (!Request.Headers.ContainsKey("Authorization") || !_helperService.ValidateHeader(Request.Headers["Authorization"]))
             {
                 return new UnauthorizedObjectResult(new
                 {
@@ -174,7 +174,7 @@ namespace BoilerPlate.Controllers
                 });
             }
 
-            var response = await _userService.DeleteUser(Convert.ToInt32(id));
+            var response = await _userService.DeleteUser(id.Value);
 
             if (!response)
             {
