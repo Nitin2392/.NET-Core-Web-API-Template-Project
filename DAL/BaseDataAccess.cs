@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Linq;
+using BoilerPlate.Configuration;
+using Microsoft.Extensions.Options;
 
 public class BaseDataAccess
 {
     protected string ConnectionString { get; set; }
+    private readonly AppSettings _appSettings;
 
-    public BaseDataAccess()
+    public BaseDataAccess(AppSettings appSettings)
     {
-    }
-
-    public BaseDataAccess(string connectionString)
-    {
-        this.ConnectionString = connectionString;
+        _appSettings = appSettings;
+        ConnectionString = _appSettings.DbConnectionString;
     }
 
     private SqlConnection GetConnection()
@@ -25,7 +26,7 @@ public class BaseDataAccess
         return connection;
     }
 
-    protected DbCommand GetCommand(DbConnection connection, string commandText, CommandType commandType)
+    private SqlCommand GetCommand(DbConnection connection, string commandText, CommandType commandType)
     {
         SqlCommand command = new SqlCommand(commandText, connection as SqlConnection)
         {
@@ -34,7 +35,7 @@ public class BaseDataAccess
         return command;
     }
 
-    protected SqlParameter GetParameter(string parameter, object value)
+    public SqlParameter GetParameter(string parameter, object value)
     {
         SqlParameter parameterObject = new SqlParameter(parameter, value ?? DBNull.Value)
         {
@@ -43,7 +44,7 @@ public class BaseDataAccess
         return parameterObject;
     }
 
-    protected SqlParameter GetParameterOut(string parameter, SqlDbType type, object value = null, ParameterDirection parameterDirection = ParameterDirection.InputOutput)
+    public SqlParameter GetParameterOut(string parameter, SqlDbType type, object value = null, ParameterDirection parameterDirection = ParameterDirection.InputOutput)
     {
         SqlParameter parameterObject = new SqlParameter(parameter, type); ;
 
@@ -66,7 +67,28 @@ public class BaseDataAccess
         return parameterObject;
     }
 
-    protected int ExecuteNonQuery(string procedureName, List<DbParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
+    public DataSet ExecuteDataSet(string procedureName, List<SqlParameter> parameters)
+    {
+        DataSet dataSet = new DataSet();
+
+        var dbCommand = GetCommand(GetConnection(), procedureName, CommandType.StoredProcedure);
+
+        if (parameters != null && parameters.Any())
+        {
+            foreach (var param in parameters)
+            {
+                dbCommand.Parameters.Add(param);
+            }
+        }
+
+        var getAdapter = new SqlDataAdapter(dbCommand);
+
+        getAdapter.Fill(dataSet);
+
+        return dataSet;
+    }
+
+    public int ExecuteNonQuery(string procedureName, List<DbParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
     {
         int returnValue = -1;
 
@@ -83,7 +105,7 @@ public class BaseDataAccess
         return returnValue;
     }
 
-    protected object ExecuteScalar(string procedureName, List<SqlParameter> parameters)
+    public object ExecuteScalar(string procedureName, List<SqlParameter> parameters)
     {
         object returnValue = null;
 
@@ -102,7 +124,7 @@ public class BaseDataAccess
         return returnValue;
     }
 
-    protected DbDataReader GetDataReader(string procedureName, List<DbParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
+    public DbDataReader GetDataReader(string procedureName, List<DbParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
     {
         DbDataReader ds;
 

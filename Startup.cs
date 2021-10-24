@@ -43,11 +43,14 @@ namespace BoilerPlate
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services
-                .AddControllers(options => options.AllowEmptyInputInBodyModelBinding = true).AddJsonOptions(options =>
+                .AddControllers(options => options.AllowEmptyInputInBodyModelBinding = true)
+                .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 });
+
+            services.AddSwaggerGen();
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
@@ -67,6 +70,14 @@ namespace BoilerPlate
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "BoilerPlate App");
+            });
 
             app.UseAuthorization();
 

@@ -6,7 +6,7 @@ using BoilerPlate.Models;
 
 namespace BoilerPlate.Interfaces
 {
-    interface IUserService
+    public interface IUserService
     {
         Task<List<User>> GetAllUsers();
         Task<User> GetUserById(int id);
