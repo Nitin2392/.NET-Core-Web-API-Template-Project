@@ -72,7 +72,7 @@ namespace BoilerPlate.Controllers
 
             var users = await _userService.GetUserById(id.Value);
 
-            if (users == null || users.Count == 0)
+            if (users == null)
             {
                 return new JsonResult(null);
             }
