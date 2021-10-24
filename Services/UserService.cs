@@ -54,9 +54,39 @@ namespace BoilerPlate.Services
             }
         }
 
-        public Task<User> GetUserById(int id)
+        public async Task<List<User>> GetUserById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var userList = new List<User>();
+                var dataAccess = new BaseDataAccess(_appSettings);
+
+                var paramDict = new Dictionary<string, object>
+                {
+                    {"@UserId", id}
+                };
+                var usersTable = dataAccess.ExecuteDataSet("sp_GetSpecificUser", dataAccess.GenerateParameters(paramDict));
+
+                foreach (DataRow row in usersTable.Tables[0].Rows)
+                {
+                    var user = new User()
+                    {
+                        FirstName = row["FirstName"].ToString(),
+                        LastName = row["LastName"].ToString(),
+                        Id = row["Id"].ToString(),
+                        Gender = Convert.ToChar(row["Gender"]),
+                    };
+
+                    userList.Add(user);
+                }
+
+                return userList;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Something went wrong in GetAllUsers - ", e);
+                return null;
+            }
         }
     }
 }

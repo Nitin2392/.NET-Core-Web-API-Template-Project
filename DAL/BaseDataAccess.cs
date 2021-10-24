@@ -44,6 +44,17 @@ public class BaseDataAccess
         return parameterObject;
     }
 
+    public List<SqlParameter> GenerateParameters(IDictionary<string, object> dictList)
+    {
+        var paramList = new List<SqlParameter>();
+        foreach (var kvp in dictList)
+        {
+            paramList.Add(GetParameter(kvp.Key, kvp.Value));
+        }
+
+        return paramList;
+    }
+
     public SqlParameter GetParameterOut(string parameter, SqlDbType type, object value = null, ParameterDirection parameterDirection = ParameterDirection.InputOutput)
     {
         SqlParameter parameterObject = new SqlParameter(parameter, type); ;

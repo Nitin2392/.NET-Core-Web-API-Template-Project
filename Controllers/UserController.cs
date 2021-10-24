@@ -26,6 +26,7 @@ namespace BoilerPlate.Controllers
 
         //Sample GET request to get all users
 
+        [ProducesResponseType(typeof(List<User>), 200)]
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -35,15 +36,28 @@ namespace BoilerPlate.Controllers
             {
                 return new JsonResult(null);
             }
-            else
-            {
-                return new OkObjectResult(users);
-            }
+
+            return new OkObjectResult(users);
         }
 
-
-        
         //Sample GET request based on ID
+        [HttpGet("GetUserById/{id}")]
+        public async Task<IActionResult> GetAllUsers(int? id)
+        {
+            if (id == null || id.Value <= 0)
+            {
+                return new BadRequestObjectResult("Id cannot be null or lesser than zero");
+            }
+
+            var users = await _userService.GetUserById(id.Value);
+
+            if (users == null || users.Count == 0)
+            {
+                return new JsonResult(null);
+            }
+
+            return new OkObjectResult(users);
+        }
 
         //Sample POST request 
 
