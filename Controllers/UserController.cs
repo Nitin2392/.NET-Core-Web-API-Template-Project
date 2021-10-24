@@ -16,12 +16,15 @@ namespace BoilerPlate.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
+        private readonly IHelperService _helperService;
         private readonly IUserService _userService;
 
-        public UserController(ILogger<UserController> logger, IUserService userService)
+        public UserController(ILogger<UserController> logger, IHelperService helperService, 
+            IUserService userService)
         {
             _logger = logger;
             _userService = userService;
+            _helperService = helperService;
         }
 
         //Sample GET request to get all users
@@ -30,6 +33,14 @@ namespace BoilerPlate.Controllers
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
+            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            {
+                return new UnauthorizedObjectResult(new 
+                {
+                    Error = "Request Not Authenticated" //Anonymous Types
+                });
+            }
+            
             var users = await _userService.GetAllUsers();
 
             if (users == null || users.Count == 0)
@@ -44,6 +55,14 @@ namespace BoilerPlate.Controllers
         [HttpGet("GetUserById/{id}")]
         public async Task<IActionResult> GetAllUsers(int? id)
         {
+            if (!Request.Headers.ContainsKey("Authorization") || _helperService.ValidateHeader(Request.Headers["Authorization"]))
+            {
+                return new UnauthorizedObjectResult(new
+                {
+                    Error = "Request Not Authenticated" //Anonymous Types
+                });
+            }
+
             if (id == null || id.Value <= 0)
             {
                 return new BadRequestObjectResult("Id cannot be null or lesser than zero");
