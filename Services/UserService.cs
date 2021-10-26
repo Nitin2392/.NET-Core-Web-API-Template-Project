@@ -64,7 +64,7 @@ namespace BoilerPlate.Services
                     return (User) cachedUser;
                 }
 
-                var userList = new User();
+                var user = new User();
                 var dataAccess = new BaseDataAccess(_appSettings);
 
                 var paramDict = new Dictionary<string, object>
@@ -75,7 +75,7 @@ namespace BoilerPlate.Services
 
                 foreach (DataRow row in usersTable.Tables[0].Rows)
                 {
-                    var user = new User()
+                    user = new User()
                     {
                         FirstName = row["FirstName"].ToString(),
                         LastName = row["LastName"].ToString(),
@@ -84,7 +84,7 @@ namespace BoilerPlate.Services
                     };
                 }
                 
-                return userList;
+                return user;
             }
             catch (Exception e)
             {
@@ -173,6 +173,41 @@ namespace BoilerPlate.Services
             catch (Exception e)
             {
                 _logger.LogError("Something went wrong in CreateNewUser", e);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreateNewPoll(Poll pollData)
+        {
+            //Post this to the DB server and return a boolean response
+            try
+            {
+                var dataAccess = new BaseDataAccess(_appSettings);
+
+                var paramDict = new Dictionary<string, object>
+                {
+                    {"@Title",pollData.Title},
+                    {"@Description",pollData.Description},
+                    {"@Option1",pollData.Options[0].Option},
+                    {"@Option2",pollData.Options[1].Option},
+                    {"@Option3",pollData.Options[2].Option}
+                };
+
+                var dataSet = dataAccess.ExecuteDataSet("sp_CreateNewPoll", dataAccess.GenerateParameters(paramDict));
+                var response = dataSet.Tables[0].Rows[0]["PollId"].ToString();
+
+                CacheHelper.Add(response, pollData, DateTime.UtcNow.AddDays(30));
+
+                if(response!= null)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Somethign went wrong while creating a poll", ex.Message);
                 return false;
             }
         }

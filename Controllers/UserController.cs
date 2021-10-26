@@ -8,12 +8,14 @@ using BoilerPlate.Interfaces;
 using BoilerPlate.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Cors;
 using Newtonsoft.Json;
 using static BoilerPlate.Configuration.ModelValidation;
 
 namespace BoilerPlate.Controllers
 { 
     [ApiController]
+    [EnableCors("AllowAnyOrigin")]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
@@ -32,6 +34,7 @@ namespace BoilerPlate.Controllers
         //Sample GET request to get all users
 
         [ProducesResponseType(typeof(List<User>), 200)]
+        
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -111,6 +114,37 @@ namespace BoilerPlate.Controllers
             {
                 UserId = userId.ToString()
             });
+        }
+
+        //Post New Poll
+        [HttpPost("CreateNewPoll")]
+        public async Task<IActionResult> CreateNewPOll([FromBody] Poll poll)
+        {
+            if (!Request.Headers.ContainsKey("Authorization") || !_helperService.ValidateHeader(Request.Headers["Authorization"]))
+            {
+                return new UnauthorizedObjectResult(new
+                {
+                    Error = "Request Not Authenticated" //Anonymous Types
+                });
+            }
+
+            if(poll == null || poll.Title == null || poll.Options == null || poll.Options.Count == 0)
+            {
+                return new BadRequestResult();
+            }
+
+            var createPoll = await _userService.CreateNewPoll(poll);
+
+            if(createPoll)
+            {
+                return new OkObjectResult(new
+                {
+                    Response = "Success",
+                });
+            }
+
+            return new BadRequestResult();
+
         }
 
         //Sample PUT request 

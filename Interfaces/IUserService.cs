@@ -16,5 +16,7 @@ namespace BoilerPlate.Interfaces
         Task<int> UpdateUser(User user, int userId);
 
         Task<bool> DeleteUser(int userId);
+
+        Task<bool> CreateNewPoll(Poll pollData);
     }
 }

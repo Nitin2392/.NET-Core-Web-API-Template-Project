@@ -1,4 +1,6 @@
-﻿namespace BoilerPlate.Models
+﻿using System.Collections.Generic;
+
+namespace BoilerPlate.Models
 {
     public class User
     {
@@ -15,5 +17,20 @@
         Male,
         Female,
         Other
+    }
+
+    public class Poll
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public List<Options> Options { get; set; }
+        
+    }
+
+    public class Options
+    {
+        public int Id { get; set; }
+        public string Option { get; set; }
     }
 }
