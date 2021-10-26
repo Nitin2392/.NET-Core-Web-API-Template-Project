@@ -74,6 +74,8 @@ namespace BoilerPlate
 
             app.UseSwagger();
 
+            app.UseCors("AllowAnyOrigin");
+
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
