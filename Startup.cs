@@ -58,6 +58,7 @@ namespace BoilerPlate
             //DI services
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IHelperService, HelperService>();
+            services.AddSingleton<IPhotographyService, PhotographerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
