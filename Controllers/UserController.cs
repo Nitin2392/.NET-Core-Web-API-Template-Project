@@ -35,22 +35,31 @@ namespace BoilerPlate.Controllers
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
-            if (!Request.Headers.ContainsKey("Authorization") || !_helperService.ValidateHeader(Request.Headers["Authorization"]))
+
+            try
             {
-                return new UnauthorizedObjectResult(new 
+                if (!Request.Headers.ContainsKey("Authorization") || !_helperService.ValidateHeader(Request.Headers["Authorization"]))
                 {
-                    Error = "Request Not Authenticated" //Anonymous Types
-                });
-            }
-            
-            var users = await _userService.GetAllUsers();
+                    return new UnauthorizedObjectResult(new
+                    {
+                        Error = "Request Not Authenticated" //Anonymous Types
+                    });
+                }
 
-            if (users == null || users.Count == 0)
+                var users = await _userService.GetAllUsers();
+
+                if (users == null || users.Count == 0)
+                {
+                    return new JsonResult(null);
+                }
+
+                return new OkObjectResult(users);
+            }
+            catch(Exception ex)
             {
-                return new JsonResult(null);
-            }
-
-            return new OkObjectResult(users);
+                _logger.LogError("Error in Controller", ex.Message);
+                return new BadRequestResult();
+            }            
         }
 
         //Sample GET request based on ID
